@@ -168,4 +168,11 @@ NSString static *_osdCoreDataManagerModelName = nil;
     return [NSEntityDescription insertNewObjectForEntityForName:name inManagedObjectContext:context];
 }
 
++ (NSFetchRequest *)fetchRequest {
+    return [self fetchRequestWithEntityName:NSStringFromClass([self class])];
+}
++ (NSFetchRequest *)fetchRequestWithEntityName:(NSString *)entityName {
+    return [NSFetchRequest fetchRequestWithEntityName:entityName];
+}
+
 @end
