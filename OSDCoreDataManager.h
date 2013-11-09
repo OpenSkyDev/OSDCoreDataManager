@@ -33,4 +33,11 @@
 
 @end
 
+@interface NSManagedObject (OSDCoreDataManagerAdditions)
+
++ (instancetype)insertIntoContext:(NSManagedObjectContext *)context;
++ (instancetype)insertIntoContext:(NSManagedObjectContext *)context name:(NSString *)name;
+
+@end
+
 #define OSD_CORE_DATA_MAIN_THREAD() NSAssert([[NSThread currentThread] isMainThread], @"Must call %s on the main thread",__PRETTY_FUNCTION__);

@@ -158,3 +158,14 @@ NSString static *_osdCoreDataManagerModelName = nil;
 }
 
 @end
+
+@implementation NSManagedObject (OSDCoreDataManagerAdditions)
+
++ (instancetype)insertIntoContext:(NSManagedObjectContext *)context {
+    return [self insertIntoContext:context name:NSStringFromClass([self class])];
+}
++ (instancetype)insertIntoContext:(NSManagedObjectContext *)context name:(NSString *)name {
+    return [NSEntityDescription insertNewObjectForEntityForName:name inManagedObjectContext:context];
+}
+
+@end
