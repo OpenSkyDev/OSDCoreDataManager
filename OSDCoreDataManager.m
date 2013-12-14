@@ -15,6 +15,7 @@ NSString static *_osdCoreDataManagerModelName = nil;
 @interface OSDCoreDataManager ()
 
 @property (nonatomic, strong) NSManagedObjectContext *masterObjectContext;
+@property (nonatomic, strong) NSDateFormatter *ISO8601Formatter;
 
 @end
 
@@ -155,6 +156,19 @@ NSString static *_osdCoreDataManagerModelName = nil;
 }
 - (void)_applicationWillTerminate:(NSNotification *)notification {
     [self save];
+}
+
+#pragma mark -
+#pragma mark - Date Helpers
+- (NSDateFormatter *)ISO8601Formatter {
+    if (!_ISO8601Formatter) {
+        _ISO8601Formatter = [[NSDateFormatter alloc] init];
+        _ISO8601Formatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
+    }
+    return _ISO8601Formatter;
+}
+- (NSDate *)dateFromISO8601String:(NSString *)string {
+    return [self.ISO8601Formatter dateFromString:string];
 }
 
 @end
