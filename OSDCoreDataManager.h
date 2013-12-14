@@ -6,6 +6,9 @@
  * Created by Skylar Schipper on 9/28/13
  */
 
+#ifndef OSDCoreDataManager_h
+#define OSDCoreDataManager_h
+
 @import CoreData;
 
 /*!
@@ -44,3 +47,5 @@
 @end
 
 #define OSDAssertMainThread() NSAssert([[NSThread currentThread] isMainThread], @"Must call %s on the main thread",__PRETTY_FUNCTION__)
+
+#endif
