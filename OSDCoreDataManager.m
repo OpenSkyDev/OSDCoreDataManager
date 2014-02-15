@@ -8,9 +8,20 @@
 
 
 #import "OSDCoreDataManager.h"
+#import <objc/runtime.h>
 
 id static _sharedOSDCoreDataManager = nil;
 NSString static *_osdCoreDataManagerModelName = nil;
+
+void osd_CoreData_MethodSwizzle(Class c, SEL origSEL, SEL overrideSEL) {
+    Method origMethod = class_getInstanceMethod(c, origSEL);
+    Method overrideMethod = class_getInstanceMethod(c, overrideSEL);
+    if(class_addMethod(c, origSEL, method_getImplementation(overrideMethod), method_getTypeEncoding(overrideMethod))) {
+        class_replaceMethod(c, overrideSEL, method_getImplementation(origMethod), method_getTypeEncoding(origMethod));
+    } else {
+        method_exchangeImplementations(origMethod, overrideMethod);
+    }
+}
 
 @interface OSDCoreDataManager ()
 
@@ -175,6 +186,10 @@ NSString static *_osdCoreDataManagerModelName = nil;
 
 @implementation NSManagedObject (OSDCoreDataManagerAdditions)
 
++ (void)load {
+    osd_CoreData_MethodSwizzle(self, @selector(willSave), @selector(osd_willSave));
+}
+
 + (instancetype)insertIntoContext:(NSManagedObjectContext *)context {
     return [self insertIntoContext:context name:NSStringFromClass([self class])];
 }
@@ -187,6 +202,43 @@ NSString static *_osdCoreDataManagerModelName = nil;
 }
 + (NSFetchRequest *)fetchRequestWithEntityName:(NSString *)entityName {
     return [NSFetchRequest fetchRequestWithEntityName:entityName];
+}
+
++ (NSArray *)getAll {
+    OSDAssertMainThread();
+    return [self getAllInContext:[[OSDCoreDataManager sharedManager] managedObjectContext]];
+}
++ (NSArray *)getAllInContext:(NSManagedObjectContext *)context {
+    return [self getAllInContext:context predicate:nil];
+}
++ (NSArray *)getAllInContext:(NSManagedObjectContext *)context predicate:(NSPredicate *)predicate {
+    return [self getAllInContext:context predicate:predicate sortDescriptors:nil];
+}
++ (NSArray *)getAllInContext:(NSManagedObjectContext *)context predicate:(NSPredicate *)predicate sortDescriptors:(NSArray *)sortDescriptors {
+    NSFetchRequest *fetchRequest = [self fetchRequest];
+    fetchRequest.predicate = predicate;
+    fetchRequest.sortDescriptors = sortDescriptors;
+    return [context executeFetchRequest:fetchRequest error:nil];
+}
+
++ (NSUInteger)count {
+    OSDAssertMainThread();
+    return [self countInContext:[[OSDCoreDataManager sharedManager] managedObjectContext]];
+}
++ (NSUInteger)countInContext:(NSManagedObjectContext *)context {
+    return [context countForFetchRequest:[self fetchRequest] error:nil];
+}
+
+- (void)osd_willSave {
+    [self osd_willSave];
+    SEL createdSelector = NSSelectorFromString(@"setCreatedAt:");
+    if ([self respondsToSelector:createdSelector] && ![self primitiveValueForKey:@"createdAt"]) {
+        [self setPrimitiveValue:[NSDate date] forKey:@"createdAt"];
+    }
+    SEL updatedSelector = NSSelectorFromString(@"setUpdatedAt:");
+    if ([self respondsToSelector:updatedSelector]) {
+        [self setPrimitiveValue:[NSDate date] forKey:@"updatedAt"];
+    }
 }
 
 @end

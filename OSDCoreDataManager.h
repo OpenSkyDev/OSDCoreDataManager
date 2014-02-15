@@ -110,6 +110,14 @@
  */
 + (NSFetchRequest *)fetchRequestWithEntityName:(NSString *)entityName;
 
++ (NSArray *)getAll;
++ (NSArray *)getAllInContext:(NSManagedObjectContext *)context;
++ (NSArray *)getAllInContext:(NSManagedObjectContext *)context predicate:(NSPredicate *)predicate;
++ (NSArray *)getAllInContext:(NSManagedObjectContext *)context predicate:(NSPredicate *)predicate sortDescriptors:(NSArray *)sortDescriptors;
+
++ (NSUInteger)count;
++ (NSUInteger)countInContext:(NSManagedObjectContext *)context;
+
 @end
 
 //*** Macro for making sure methods aren't called off the main thread ***//
