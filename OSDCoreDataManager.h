@@ -123,4 +123,6 @@
 //*** Macro for making sure methods aren't called off the main thread ***//
 #define OSDAssertMainThread() NSAssert([[NSThread currentThread] isMainThread], @"Must call %s on the main thread",__PRETTY_FUNCTION__)
 
+#define OSDSafeProperty(_property) (_property) ?: [NSNull null]
+
 #endif
