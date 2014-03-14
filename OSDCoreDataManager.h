@@ -124,5 +124,6 @@
 #define OSDAssertMainThread() NSAssert([[NSThread currentThread] isMainThread], @"Must call %s on the main thread",__PRETTY_FUNCTION__)
 
 #define OSDSafeProperty(_property) (_property) ?: [NSNull null]
+#define OSDNullToNil(_object) ({ __typeof__ (_object) __obj = (_object); __obj == [NSNull null] ? nil : _object; })
 
 #endif
